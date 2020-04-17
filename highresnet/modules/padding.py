@@ -44,11 +44,9 @@ def mixed_pad(input, pad, mode='constant', value=0):
         post = zero[2*i+2:]
         sequence = pre+mid+post
         if mode[i] == 'constant':
-            result = torch.nn.functional.pad(
-                result, sequence, mode='constant', value=value[i])
+            result = torch.nn.functional.pad(result, sequence, mode='constant', value=value[i])
         else:
             result = torch.nn.functional.pad(result, sequence, mode=mode[i])
-        print(result)
     return result
 
 
@@ -60,6 +58,5 @@ class MixedPad(torch.nn.Module):
         self.mode = mode
         self.value = value
 
-    def forward(self,
-                x):
+    def forward(self, x):
         return mixed_pad(x, self.pad, self.mode, self.value)
