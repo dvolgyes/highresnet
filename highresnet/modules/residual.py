@@ -21,6 +21,7 @@ class ResidualBlock(nn.Module):
             residual=True,
             residual_type='pad',
             padding_mode='constant',
+            rezero=False,
             ):
         assert residual_type in ('pad', 'project')
         super().__init__()
@@ -28,6 +29,11 @@ class ResidualBlock(nn.Module):
         self.change_dimension = in_channels != out_channels
         self.residual_type = residual_type
         self.dimensions = dimensions
+        if rezero:
+            self.rezero_scalar = torch.nn.Parameter(torch.tensor([0.], dtype=torch.float32))
+        else:
+            self.rezero_scalar = 1
+
         if self.change_dimension:
             if residual_type == 'project':
                 conv_class = nn.Conv2d if dimensions == 2 else nn.Conv3d
@@ -85,5 +91,5 @@ class ResidualBlock(nn.Module):
                         batch_size, diff_channels // 2, *spatial_dims)
                     x = torch.cat((zeros_half, x, zeros_half),
                                   dim=CHANNELS_DIM)
-            out = x + out
+            out = x + self.rezero_scalar * out
         return out

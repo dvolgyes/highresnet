@@ -23,6 +23,7 @@ class HighResNet(nn.Module):
             residual=True,
             padding_mode='constant',
             add_dropout_layer=False,
+            rezero=False,
             ):
         assert dimensions in (2, 3)
         super().__init__()
@@ -67,6 +68,7 @@ class HighResNet(nn.Module):
                 instance_norm=instance_norm,
                 residual=residual,
                 padding_mode=padding_mode,
+                rezero=rezero,
             )
             blocks.append(dilation_block)
             out_channels *= 2
