@@ -24,6 +24,7 @@ class HighResNet(nn.Module):
             padding_mode='constant',
             add_dropout_layer=False,
             rezero=False,
+            split_relu=False
             ):
         assert dimensions in (2, 3)
         super().__init__()
@@ -47,7 +48,8 @@ class HighResNet(nn.Module):
             instance_norm=instance_norm,
             preactivation=False,
             padding_mode=padding_mode,
-        )
+            split_relu=split_relu,
+            )
         blocks.append(first_conv_block)
 
         # Add dilation blocks
@@ -69,7 +71,8 @@ class HighResNet(nn.Module):
                 residual=residual,
                 padding_mode=padding_mode,
                 rezero=rezero,
-            )
+                split_relu=split_relu
+                )
             blocks.append(dilation_block)
             out_channels *= 2
         out_channels = out_channels // 2
@@ -87,7 +90,8 @@ class HighResNet(nn.Module):
                 instance_norm=instance_norm,
                 preactivation=False,
                 kernel_size=1,
-            )
+                split_relu=split_relu,
+                )
             blocks.append(dropout_conv_block)
             blocks.append(nn.Dropout3d())
 
@@ -103,7 +107,7 @@ class HighResNet(nn.Module):
             kernel_size=1,
             activation=False,
             padding_mode=padding_mode,
-        )
+            )
 
         blocks.append(classifier)
         self.block = nn.Sequential(*blocks)

@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from .padding import MixedPad
-
+from .split import SplitReLU
 
 PADDING_MODES = {
     'reflect',
@@ -25,6 +25,7 @@ class ConvolutionalBlock(nn.Module):
             preactivation=True,
             kernel_size=3,
             activation=True,
+            split_relu=False,
             ):
         assert padding_mode in PADDING_MODES
         assert not (batch_norm and instance_norm)
@@ -45,10 +46,19 @@ class ConvolutionalBlock(nn.Module):
             if batch_norm or instance_norm:
                 layers.append(norm_class(in_channels, affine=norm_affine))
             if activation:
-                layers.append(nn.ReLU())
+                if split_relu:
+                    layers.append(SplitReLU())
+                else:
+                    layers.append(nn.ReLU())
 
         if kernel_size > 1:
             layers.append(padding_instance)
+
+        if split_relu and activation:
+            if preactivation:
+                in_channels = in_channels * 2
+            else:
+                out_channels = out_channels // 2
 
         use_bias = not (instance_norm or batch_norm)
         conv_layer = conv_class(
@@ -57,14 +67,16 @@ class ConvolutionalBlock(nn.Module):
             kernel_size=kernel_size,
             dilation=dilation,
             bias=use_bias,
-        )
+            )
         layers.append(conv_layer)
 
         if not preactivation:
             if batch_norm or instance_norm:
                 layers.append(norm_class(out_channels, affine=norm_affine))
-            if activation:
-                layers.append(nn.ReLU())
+                if split_relu:
+                    layers.append(SplitReLU())
+                else:
+                    layers.append(nn.ReLU())
 
         self.convolutional_block = nn.Sequential(*layers)
 

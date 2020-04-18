@@ -22,6 +22,7 @@ class ResidualBlock(nn.Module):
             residual_type='pad',
             padding_mode='constant',
             rezero=False,
+            split_relu=False
             ):
         assert residual_type in ('pad', 'project')
         super().__init__()
@@ -55,6 +56,7 @@ class ResidualBlock(nn.Module):
                 batch_norm=batch_norm,
                 instance_norm=instance_norm,
                 padding_mode=padding_mode,
+                split_relu=split_relu
             )
             conv_blocks.append(conv_block)
             in_channels = out_channels

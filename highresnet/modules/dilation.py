@@ -16,6 +16,7 @@ class DilationBlock(nn.Module):
             residual=True,
             padding_mode='constant',
             rezero=False,
+            split_relu=False,
             ):
         super().__init__()
         self.in_channels = in_channels
@@ -33,7 +34,8 @@ class DilationBlock(nn.Module):
                 residual=residual,
                 padding_mode=padding_mode,
                 rezero=rezero,
-            )
+                split_relu=split_relu,
+                )
             residual_blocks.append(residual_block)
             in_channels = out_channels
         self.dilation_block = nn.Sequential(*residual_blocks)
