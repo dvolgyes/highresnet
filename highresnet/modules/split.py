@@ -15,12 +15,14 @@ from torch.nn.functional import relu
 #
 # In new formalism:
 # ...
+# x = split(x)
+# x = conv(in*2, out, ...)
+# x = split(x)
+# x = conv(in*2, out, ...)
 # x = relu(x)
-# x = conv(in*2, out, ...)
-# x = split(x)
-# x = conv(in*2, out, ...)
-# x = split(x)
-#
+##  Remark: final activation might remain ReLU,
+##  but often there is no activation after the last conv.
+
 
 
 def split_relu_without_merge(t):
