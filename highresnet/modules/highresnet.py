@@ -26,6 +26,8 @@ class HighResNet(nn.Module):
             ):
         assert dimensions in (2, 3)
         super().__init__()
+        if isinstance(padding_mode, list):
+            padding_mode = tuple(padding_mode)
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.layers_per_residual_block = layers_per_residual_block
