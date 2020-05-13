@@ -27,8 +27,15 @@ class ConvolutionalBlock(nn.Module):
             activation=True,
             split_relu=False,
             ):
-        assert padding_mode in PADDING_MODES
+
+        if isinstance(padding_mode, (tuple, list)):
+            for mode in padding_mode:
+                assert mode in PADDING_MODES
+        else:
+            assert padding_mode in PADDING_MODES
+
         assert not (batch_norm and instance_norm)
+
         super().__init__()
 
         padding_instance = MixedPad(dilation, padding_mode)
