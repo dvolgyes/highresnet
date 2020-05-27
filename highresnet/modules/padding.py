@@ -57,7 +57,6 @@ def mixed_pad(input, pad, mode='constant', value=0, reversed_axes = False):
                 result, sequence, mode='constant', value=value[i])
         else:
             result = torch.nn.functional.pad(result, sequence, mode=mode[i])
-        print(result)
     return result
 
 
