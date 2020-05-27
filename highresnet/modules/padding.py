@@ -71,6 +71,5 @@ class MixedPad(torch.nn.Module):
         self.value = value
         self.reversed_axes = reversed_axes
 
-    def forward(self,
-                x):
-        return mixed_pad(x, self.pad, self.mode, self.value)
+    def forward(self, x):
+        return mixed_pad(x, self.pad, self.mode, self.value, reversed_axes)
