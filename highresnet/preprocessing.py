@@ -83,8 +83,7 @@ def resample_spacing(nifti, output_spacing, interpolation):
     resample.SetTransform(identity)
     resampled = resample.Execute(image)
     sitk.WriteImage(resampled, temp_path)
-    nifti_resampled = nib.load(temp_path)
-    return nifti_resampled
+    return nib.load(temp_path)
 
 
 def resample_ras_1mm_iso(nifti, interpolation=None):
@@ -95,12 +94,11 @@ def resample_ras_1mm_iso(nifti, interpolation=None):
     one_iso = 1, 1, 1
     if np.allclose(spacing, one_iso):
         return nii_ras
-    nii_resampled = resample_spacing(
-        nii_ras,
-        output_spacing=one_iso,
-        interpolation=interpolation,
-    )
-    return nii_resampled
+    return resample_spacing(
+            nii_ras,
+            output_spacing=one_iso,
+            interpolation=interpolation,
+        )
 
 
 def resample_to_reference(

@@ -9,8 +9,7 @@ def highres2dnet(*args, **kwargs):
     HighRes3DNet by Li et al. 2017 for T1-MRI brain parcellation
     """
     from highresnet import HighRes2DNet
-    model = HighRes2DNet(*args, **kwargs)
-    return model
+    return HighRes2DNet(*args, **kwargs)
 
 
 def highres3dnet(*args, pretrained=False, **kwargs):

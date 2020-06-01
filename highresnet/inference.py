@@ -113,8 +113,7 @@ def check_header(nifti_image):
     is_1_iso = np.allclose(spacing, one_iso)
     if not is_1_iso:
         print(f'Detected spacing: {spacing}. Resampling to 1 mm iso...')
-    needs_resampling = not is_ras or not is_1_iso
-    return needs_resampling
+    return not is_ras or not is_1_iso
 
 
 def get_device(cuda_device=0):
@@ -137,5 +136,4 @@ def get_model():
     """
     repo = 'fepegar/highresnet'
     model_name = 'highres3dnet'
-    model = torch.hub.load(repo, model_name, pretrained=True)
-    return model
+    return torch.hub.load(repo, model_name, pretrained=True)

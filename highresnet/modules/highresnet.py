@@ -128,8 +128,7 @@ class HighResNet(nn.Module):
         N = self.residual_blocks_per_dilation
         d = torch.arange(D)
         input_output_diff = (3 - 1) + torch.sum(B * N * 2 ** (d + 1))
-        receptive_field = input_output_diff + 1
-        return receptive_field
+        return input_output_diff + 1
 
     def get_receptive_field_world(self, spacing=1):
         return self.receptive_field * spacing

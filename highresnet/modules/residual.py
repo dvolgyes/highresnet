@@ -28,16 +28,15 @@ class ResidualBlock(nn.Module):
         self.change_dimension = in_channels != out_channels
         self.residual_type = residual_type
         self.dimensions = dimensions
-        if self.change_dimension:
-            if residual_type == 'project':
-                conv_class = nn.Conv2d if dimensions == 2 else nn.Conv3d
-                self.change_dim_layer = conv_class(
-                    in_channels,
-                    out_channels,
-                    kernel_size=1,
-                    dilation=dilation,
-                    bias=False,  # as in NiftyNet and PyTorch's ResNet model
-                )
+        if self.change_dimension and residual_type == 'project':
+            conv_class = nn.Conv2d if dimensions == 2 else nn.Conv3d
+            self.change_dim_layer = conv_class(
+                in_channels,
+                out_channels,
+                kernel_size=1,
+                dilation=dilation,
+                bias=False,  # as in NiftyNet and PyTorch's ResNet model
+            )
 
         conv_blocks = nn.ModuleList()
         for _ in range(num_layers):

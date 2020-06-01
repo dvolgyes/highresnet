@@ -10,8 +10,7 @@ def get_data_url_from_model_zoo():
         config_string = response.read().decode()
     config = ConfigParser()
     config.read_string(config_string)
-    data_url = config['data']['url']
-    return data_url
+    return config['data']['url']
 
 
 def download_data(data_url):

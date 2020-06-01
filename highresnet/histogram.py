@@ -28,8 +28,7 @@ def __compute_percentiles(img, mask, cutoff):
             0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.9,
             cutoff[1]]
     masked_img = ma.masked_array(img, np.logical_not(mask)).compressed()
-    perc_results = np.percentile(masked_img, 100 * np.array(perc))
-    return perc_results
+    return np.percentile(masked_img, 100 * np.array(perc))
 
 
 def __standardise_cutoff(cutoff, type_hist='percentile'):
