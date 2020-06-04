@@ -26,12 +26,12 @@ from torch.nn.functional import relu
 
 
 def split_relu_without_merge(t):
-    zero = torch.tensor([0],dtype = t.dtype)
+    zero = torch.tensor([0],dtype = t.dtype).to(t.device)
     smaller, larger = torch.min(t,zero), torch.max(t,zero)
     return smaller, larger
 
 def split_relu(t):
-    zero = torch.tensor([0],dtype = t.dtype)
+    zero = torch.tensor([0],dtype = t.dtype).to(t.device)
     smaller, larger = torch.min(t,zero), torch.max(t,zero)
     return torch.cat((smaller, larger), dim=1)
 
