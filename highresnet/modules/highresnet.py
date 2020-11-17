@@ -14,10 +14,11 @@ class HighResNet(nn.Module):
             in_channels,
             out_channels,
             dimensions=None,
-            initial_out_channels_power=4,
+            out_channels_power=4,
             layers_per_residual_block=2,
             residual_blocks_per_dilation=3,
             dilations=3,
+            dilation_step=None,
             batch_norm=True,
             instance_norm=False,
             residual=True,
@@ -35,11 +36,45 @@ class HighResNet(nn.Module):
         self.residual_blocks_per_dilation = residual_blocks_per_dilation
         self.dilations = dilations
 
+        if dilation_step is None:
+            self.dilation_step = tuple(2**i for i in range(dilations))
+        elif isinstance(dilation_step, int):
+            self.dilation_step = (dilation_step,) * (dilations)
+        elif isinstance(dilation_step, (tuple,list)):
+            self.dilation_step = tuple(dilation_step)
+        else:
+            NotImplementedError
+
+        assert isinstance(self.dilation_step, tuple)
+        assert len(self.dilation_step) == self.dilations
+
+        if isinstance(residual_blocks_per_dilation, int):
+            self.residual_blocks_per_dilation = (residual_blocks_per_dilation,) * (dilations)
+        elif isinstance(residual_blocks_per_dilation, (tuple,list)):
+            self.residual_blocks_per_dilation = tuple(residual_blocks_per_dilation)
+        else:
+            NotImplementedError
+
+        assert isinstance(self.residual_blocks_per_dilation, tuple)
+        assert len(self.residual_blocks_per_dilation) == self.dilations
+
+        if isinstance(out_channels_power, int):
+            self.out_channels_power = [(out_channels_power+i) for i in range(self.dilations)]
+        elif isinstance(out_channels_power, (tuple,list)):
+            self.out_channels_power = tuple(out_channels_power)
+        else:
+            NotImplementedError
+
+        assert isinstance(self.out_channels_power, tuple)
+        assert len(self.out_channels_power) == self.dilations
+
+
+
         # List of blocks
         blocks = nn.ModuleList()
 
         # Add first conv layer
-        initial_out_channels = 2 ** initial_out_channels_power
+        initial_out_channels = 2**out_channels_power[0]
         first_conv_block = ConvolutionalBlock(
             in_channels=self.in_channels,
             out_channels=initial_out_channels,
@@ -53,19 +88,20 @@ class HighResNet(nn.Module):
         blocks.append(first_conv_block)
 
         # Add dilation blocks
-        in_channels = out_channels = initial_out_channels
+        in_channels = initial_out_channels
         dilation_block = None  # to avoid pylint errors
         for dilation_idx in range(dilations):
             if dilation_idx >= 1:
                 in_channels = dilation_block.out_channels
-            dilation = 2 ** dilation_idx
+            dilation = self.dilation_step[dilation_idx]
+            out_channels = 2**self.out_channels_power[dilation_idx]
             dilation_block = DilationBlock(
                 in_channels,
                 out_channels,
                 dilation,
                 dimensions,
                 layers_per_block=layers_per_residual_block,
-                num_residual_blocks=residual_blocks_per_dilation,
+                num_residual_blocks=self.residual_blocks_per_dilation[dilation_idx],
                 batch_norm=batch_norm,
                 instance_norm=instance_norm,
                 residual=residual,
@@ -73,8 +109,6 @@ class HighResNet(nn.Module):
                 rezero=rezero,
             )
             blocks.append(dilation_block)
-            out_channels *= 2
-        out_channels = out_channels // 2
 
         # Add dropout layer as in NiftyNet
         if add_dropout_layer:
@@ -125,6 +159,8 @@ class HighResNet(nn.Module):
         N: number of residual blocks per dilation factor
         D: number of different dilation factors
         """
+        raise NotImplementedError  #after the customizations, it is not updated yet
+
         B = self.layers_per_residual_block
         D = self.dilations
         N = self.residual_blocks_per_dilation
