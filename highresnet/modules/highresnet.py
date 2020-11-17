@@ -18,7 +18,7 @@ class HighResNet(nn.Module):
             layers_per_residual_block=2,
             residual_blocks_per_dilation=3,
             dilations=3,
-            dilation_step=None,
+            dilation_steps=None,
             batch_norm=True,
             instance_norm=False,
             residual=True,
@@ -36,17 +36,17 @@ class HighResNet(nn.Module):
         self.residual_blocks_per_dilation = residual_blocks_per_dilation
         self.dilations = dilations
 
-        if dilation_step is None:
-            self.dilation_step = tuple(2**i for i in range(dilations))
-        elif isinstance(dilation_step, int):
-            self.dilation_step = (dilation_step,) * (dilations)
-        elif isinstance(dilation_step, (tuple,list)):
-            self.dilation_step = tuple(dilation_step)
+        if dilation_steps is None:
+            self.dilation_steps = tuple(2**i for i in range(dilations))
+        elif isinstance(dilation_steps, int):
+            self.dilation_steps = (dilation_steps,) * (dilations)
+        elif isinstance(dilation_steps, (tuple,list)):
+            self.dilation_steps = tuple(dilation_steps)
         else:
             NotImplementedError
 
-        assert isinstance(self.dilation_step, tuple)
-        assert len(self.dilation_step) == self.dilations
+        assert isinstance(self.dilation_steps, tuple)
+        assert len(self.dilation_steps) == self.dilations
 
         if isinstance(residual_blocks_per_dilation, int):
             self.residual_blocks_per_dilation = (residual_blocks_per_dilation,) * (dilations)
@@ -93,7 +93,7 @@ class HighResNet(nn.Module):
         for dilation_idx in range(dilations):
             if dilation_idx >= 1:
                 in_channels = dilation_block.out_channels
-            dilation = self.dilation_step[dilation_idx]
+            dilation = self.dilation_steps[dilation_idx]
             out_channels = 2**self.out_channels_power[dilation_idx]
             dilation_block = DilationBlock(
                 in_channels,
